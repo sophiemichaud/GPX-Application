@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>GPS Data Viewer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="GPS Data Viewer">
+    <meta name="keywords" content="GPS Data Viewer">
+    <meta name="author" content="Sophie Michaud">
+    <!-- Load jquery, bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <!-- Custom CSS End -->
+</head>
+
+<body>
+    <h1>GPS Data Viewer</h1>
+    <hr>
+    <h3>A3 Functionality</h3>
+    <hr>
+    </br>
+    <!-- File Log Panel -->
+    <div class="card">
+        <div class="card-header">
+          <h3>File Log</h3>
+        </div>
+        <div class="card-body" id="file-log-body">
+          <table class="table table-dark table-hover" id="file-log-table">
+            <thead>
+                <tr>
+                  <th scope="col">File Name (Click to Download)</th>
+                  <th scope="col">Version</th>
+                  <th scope="col">Creator</th>
+                  <th scope="col">Number of Waypoints</th>
+                  <th scope="col">Number of Routes</th>
+                  <th scope="col">Number of Tracks</th>
+                </tr>
+            </thead>
+            <tbody>
+          
+            </tbody>
+          </table>
+          <hr>
+          <p>Choose a file to upload to the server:</p>
+          <form ref='uploadForm'
+            id='uploadForm'
+              action='/upload'
+              method='post'
+              encType="multipart/form-data">
+              <div class="form-group">
+                <input type="file" accept=".gpx" name="uploadFile" class="btn btn-dark" required>
+                <input type='submit' value='Upload File' class="btn btn-dark">
+              </div>
+          </form>
+        </div>
+    </div>
+    </br>
+
+    <!-- GPX View Panel -->
+    <div class="card">
+        <div class="card-header">
+          <h3>GPX View</h3>
+        </div>
+        <div class="card-body">
+          <p>Choose a file to view its route and track data:</p>
+          <form>
+            <div class="form-row align-items-center">
+              <div class="col-auto my-1">
+                <label class="mr-sm-2 sr-only" for="inlineFormCustomSelect">Preference</label>
+                <select class="custom-select mr-sm-2" id="file-log-menu">
+                  <option selected>Choose File</option>
+                </select>
+              </div>
+            </div>
+          </form>
+          <hr>
+          <p class="card-text">Below are tables displaying the properties of the routes and tracks in your selected GPX file:</p>
+          <h6>List of Routes</h6>
+          <p id="route-message"></p>
+          <table class="table table-dark table-hover" id="route-table">
+            <thead>
+                <tr>
+                    <th scope="col">Route #</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Number of Points</th>
+                    <th scope="col">Length</th>
+                    <th scope="col">Loop</th>
+                    <th scope="col">Other Data</th>
+                    <th scope="col">Rename</th>
+                </tr>
+            </thead>
+            <tbody id="route-table-body">
+            
+            </tbody>
+          </table>
+          <h6>List of Tracks</h6>
+          <p id="track-message"></p>
+          <table class="table table-dark table-hover" id="track-table">
+            <thead>
+                <tr>
+                    <th scope="col">Track #</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Number of Points</th>
+                    <th scope="col">Length</th>
+                    <th scope="col">Loop</th>
+                    <th scope="col">Other Data</th>
+                    <th scope="col">Rename</th>
+                </tr>
+            </thead>
+            <tbody id="track-table-body">
+
+            </tbody>
+          </table>
+        </div>
+    </div>
+    </br>
+
+    <!-- Create New GPX Panel -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Create a GPX File</h3>
+      </div>
+      <div class="card-body">
+        <p class="card-text">Enter a file name, version, and creator to add a new GPX file to the server:</p>
+        <form id="create-gpx">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="file-name">File Name</label>
+              <input class="form-control" id="file-name" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="version">Version</label>
+              <input class="form-control" id="version" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="creator">Creator</label>
+              <input class="form-control" id="creator" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-dark">Create GPX</button>
+        </form>
+      </div>
+    </div>
+    </br>
+
+    <!-- Add a Route Panel-->
+    <div class="card">
+      <div class="card-header">
+        <h3>Add a Route</h3>
+      </div>
+      <div class="card-body">
+        <p>Choose a GPX file to add a route to:</p>
+        <form>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label class="mr-sm-2 sr-only" for="inlineFormCustomSelect">Preference</label>
+              <select class="custom-select mr-sm-2" id="add-route-menu">
+                <option selected>Choose File</option>
+              </select>
+              </br>
+              <label for="route-name">Route Name</label>
+              <input class="form-control" id="route-name" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-dark">Add Route</button>
+        </form>
+        <hr>
+        <h6>Add Waypoint to Route</h6>
+        <form>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="waypoint-name">Waypoint Name</label>
+                <input class="form-control" id="waypoint-name" required>
+                <label for="waypoint-latitude">Latitude</label>
+                <input class="form-control" id="waypoint-latitude" required>
+                <label for="waypoint-longitude">Longitude</label>
+                <input class="form-control" id="waypoint-longitude" required>
+              </div>
+            </div>
+          <button type="submit" class="btn btn-dark">Add Waypoint</button>
+        </form>
+      </div>
+    </div>
+    </br>
+
+    <!-- Find Path Between Panel-->
+    <div class="card">
+      <div class="card-header">
+        <h3>Find Path Between</h3>
+      </div>
+      <div class="card-body">
+        <p>This section of the application will allow you to find a path (route or track)
+          between two locations. You will need to enter the latitude and longitude of your
+          start and end points, and the desired point comparison accuracy.
+        </p>
+        <hr>
+        <h6>Start Point Coordinates</h6>
+        <form id = "find-path">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="starting-latitude">Latitude</label>
+              <input class="form-control" id="starting-latitude" required>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="starting-longitude">Longitude</label>
+              <input class="form-control" id="starting-longitude" required>
+            </div>
+          </div>
+          <h6>End Point Coordinates</h6>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="ending-latitude">Latitude</label>
+              <input class="form-control" id="ending-latitude" required>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="ending-longitude">Longitude</label>
+              <input class="form-control" id="ending-longitude" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="point-comparison">Point Comparison Accuracy</label>
+              <input class="form-control" id="point-comparison" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-dark">Find Path</button>
+        </form>
+        <hr>
+        <p class="card-text">Below are tables showing the routes and tracks between your selected coordinates:</p>
+          <table class="table table-dark table-hover" id="path-route-table">
+            <thead>
+                <tr>
+                    <th scope="col">Route #</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Number of Points</th>
+                    <th scope="col">Length</th>
+                    <th scope="col">Loop</th>
+                    <th scope="col">Other Data</th>
+                    <th scope="col">Rename</th>
+                </tr>
+            </thead>
+            <tbody id="path-route-table-body">
+            
+            </tbody>
+          </table>
+          <table class="table table-dark table-hover" id="path-track-table">
+            <thead>
+                <tr>
+                    <th scope="col">Track #</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Number of Points</th>
+                    <th scope="col">Length</th>
+                    <th scope="col">Loop</th>
+                    <th scope="col">Other Data</th>
+                    <th scope="col">Rename</th>
+                </tr>
+            </thead>
+            <tbody id="path-track-table-body">
+
+            </tbody>
+          </table>
+      </div>
+    </div>
+    </br>
+
+    <!-- Find Tracks and Routes with Specified Length Panel-->
+    <div class="card">
+      <div class="card-header">
+        <h3>Find Number of Routes or Paths with Specified Length</h3>
+      </div>
+      <div class="card-body">
+        <p>This section of the application will allow you to find the number of routes
+           and tracks that have the same length as you sepcify below.
+        </p>
+        <hr>
+        <form>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="starting-latitude">Specified Length</label>
+              <input class="form-control" id="specified-length">
+            </div>
+          </div>
+        </form>
+        <h6 id="num-routes">Number of Routes: </h6>
+        <h6 id="num-tracks">Number of Tracks: </h6>
+      </div>
+    </div>
+  </br>
+
+  <div class="modal fade" id="exampleModalCenterRoute" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Route Data</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body-route">
+          <table class="table table-dark table-hover" id="route-data-table">
+            <thead>
+                <tr>
+                    <th scope="col">Data Name</th>
+                    <th scope="col">Data Value</th>
+                </tr>
+            </thead>
+            <tbody id="route-data-table-body">
+
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="exampleModalCenterRouteRename" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Rename Route</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body-track">
+          <form id = "name-route">
+            <div class="form-group col-md-6">
+              </br>
+              <label for="new-route-name">New Route Name</label>
+              <input class="form-control" id="new-route-name" required>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-secondary" data-dismiss="modal">Rename</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="exampleModalCenterTrackRename" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Rename Track</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body-track">
+          <form id = "name-track">
+            <div class="form-group col-md-6">
+              </br>
+              <label for="new-track-name">New Track Name</label>
+              <input class="form-control" id="new-track-name" required>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-secondary" data-dismiss="modal">Rename</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  <!---------------------------------------------- A4 UI -------------------------------------------------------------->
+
+
+  <h3>A4 Functionality</h3>
+  <hr>
+  </br>
+
+  <!---------------------------------------------- Login -------------------------------------------------------------->
+  <div class="card">
+    <div class="card-header">
+      <h3>Login</h3>
+    </div>
+    <div class="card-body" id="file-log-body">
+      <p>Enter your username, password, and database name to login.</p>
+      <form id="login-form">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" id="username" required>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" required>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="database">Database Name</label>
+            <input type="text" class="form-control" id="database" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-dark id="login-button">Login</button>
+      </form>
+    </div>
+</div>
+</br>
+
+<!---------------------------------------------- Store All Files in Database -------------------------------------------------------------->
+<div class="card">
+	<div class="card-header">
+		<h3>Store All Files</h3>
+	</div>
+    <div class="card-body">
+		<p>The button below will store all the files displayed in the file log panel into the database.</p> 
+		<button type="button" class="btn btn-dark" id="store-all-files-button" disabled>Store All Files</button>
+	</div>
+</div>
+</br>
+
+<!---------------------------------------------- Update DB -------------------------------------------------------------->
+<div class="card">
+	<div class="card-header">
+		<h3>Database Status</h3>
+	</div>
+    <div class="card-body">
+		<p class="card-text" id="status">Database has N1 files, N2 routes and N3 points.</p>
+		<button type="button" class="btn btn-dark" id="update-button" disabled>Update</button>
+	</div>
+</div>
+</br>
+
+<!---------------------------------------------- Clear All Data -------------------------------------------------------------->
+<div class="card">
+	<div class="card-header">
+		<h3>Clear All Data</h3>
+	</div>
+    <div class="card-body">
+		<p>The button below will delete all rows from all tables in the database.</p> 
+		<button type="button" class="btn btn-dark" id="clear-data-button" disabled>Clear All Data</button>
+	</div>
+</div>
+</br>
+
+<!---------------------------------------------- Execute Queries -------------------------------------------------------------->
+<!---------------------------------------------- Query 1 -------------------------------------------------------------->
+<div class="card">
+	<div class="card-header">
+		<h3>Display All Routes - Query 1</h3>
+	</div>
+    <div class="card-body">
+		<p>This panel displays all the routes in the database. The routes can be sorted either by name or by length.</p> 
+		<form>
+			<button type="button" class="btn btn-dark" id="query1-sort-name" disabled>Sort By Name</button>
+			<button type="button" class="btn btn-dark" id="query1-sort-length" disabled>Sort By Length</button>
+		</form>
+		</br>
+		<table class="table table-dark table-hover" id="query1-table">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Length</th>
+					<th scope="col">Route ID</th>
+                </tr>
+            </thead>
+            <tbody id="query1-table-body">
+            
+            </tbody>
+        </table>
+	</div>
+</div>
+</br>
+
+
+<!---------------------------------------------- Query 2 -------------------------------------------------------------->
+<div class="card">
+	<div class="card-header">
+		<h3>Display All Routes From File - Query 2</h3>
+	</div>
+    <div class="card-body">
+		<p>This panel displays all the routes in a chosen file. The routes can be sorted either by name or by length.</p> 
+		<form>
+            <div class="form-row align-items-center">
+              <div class="col-auto my-1">
+                <label class="mr-sm-2 sr-only" for="inlineFormCustomSelect">Preference</label>
+                <select class="custom-select mr-sm-2" id="query2-menu">
+                  <option selected>Choose File</option>
+                </select>
+              </div>
+            </div>
+			</br>
+			<button type="button" class="btn btn-dark" id="query2-sort-name" disabled>Sort By Name</button>
+			<button type="button" class="btn btn-dark" id="query2-sort-length" disabled>Sort By Length</button>
+        </form>
+		</br>
+		<table class="table table-dark table-hover" id="query2-table">
+            <thead>
+                <tr>
+                    <th scope="col">Route Name</th>
+                    <th scope="col">Route Length</th>
+					<th scope="col">Route ID</th>
+					<th scope="col">File Name</th>
+                </tr>
+            </thead>
+            <tbody id="query2-table-body">
+            
+            </tbody>
+        </table>
+	</div>
+</div>
+</br>
+
+<!---------------------------------------------- Query 3 -------------------------------------------------------------->
+<div class="card">
+	<div class="card-header">
+		<h3>Display All Points From Route - Query 3</h3>
+	</div>
+    <div class="card-body">
+		<p>This panel displays all the points in a chosen route. The points will be sorted by index.</p> 
+		<form>
+            <div class="form-row align-items-center">
+              <div class="col-auto my-1">
+                <label class="mr-sm-2 sr-only" for="inlineFormCustomSelect">Preference</label>
+                <select class="custom-select mr-sm-2" id="query3-menu">
+                  <option selected>Choose Route</option>
+                </select>
+              </div>
+            </div>
+			</br>
+			<button type="button" class="btn btn-dark" id="query3-display" disabled>Display Points</button>
+        </form>
+		</br>
+		<table class="table table-dark table-hover" id="query3-table">
+            <thead>
+                <tr>
+					<th scope="col">Point Index</th>
+					<th scope="col">Point ID</th>
+                    <th scope="col">Point Name</th>
+                    <th scope="col">Latitude</th>
+					<th scope="col">Longitude</th>
+					<th scope="col">Route ID</th>
+                </tr>
+            </thead>
+            <tbody id="query3-table-body">
+            
+            </tbody>
+        </table>
+	</div>
+</div>
+</br>
+
+<!---------------------------------------------- Query 4 -------------------------------------------------------------->
+<div class="card">
+	<div class="card-header">
+		<h3>Display All Points From File - Query 4</h3>
+	</div>
+    <div class="card-body">
+		<p>This panel displays all the points in a chosen file. The points can be sorted either by route name or by route length.</p> 
+		<form>
+            <div class="form-row align-items-center">
+              <div class="col-auto my-1">
+                <label class="mr-sm-2 sr-only" for="inlineFormCustomSelect">Preference</label>
+                <select class="custom-select mr-sm-2" id="query4-menu">
+                  <option selected>Choose File</option>
+                </select>
+              </div>
+            </div>
+			</br>
+			<button type="button" class="btn btn-dark" id="query4-sort-name" disabled>Sort By Name</button>
+			<button type="button" class="btn btn-dark" id="query4-sort-length" disabled>Sort By Length</button>
+        </form>
+		</br>
+		<table class="table table-dark table-hover" id="query4-table">
+            <thead>
+                <tr>
+					<th scope="col">Point Index</th>
+					<th scope="col">Point ID</th>
+                    <th scope="col">Point Name</th>
+                    <th scope="col">Latitude</th>
+					<th scope="col">Longitude</th>
+					<th scope="col">Route ID</th>
+                </tr>
+            </thead>
+            <tbody id="query4-table-body">
+            
+            </tbody>
+        </table>
+	</div>
+</div>
+</br>
+
+<!---------------------------------------------- Query 5 -------------------------------------------------------------->
+<div class="card">
+	<div class="card-header">
+		<h3>Display N Shortest and Longest Routes From File - Query 5</h3>
+	</div>
+    <div class="card-body">
+		<p>This panel will display the N shortest and longest routes from a selected file.</p> 
+		<form>
+            <div class="form-row align-items-center">
+              <div class="col-auto my-1">
+                <label class="mr-sm-2 sr-only" for="inlineFormCustomSelect">Preference</label>
+                <select class="custom-select mr-sm-2" id="query5-menu">
+                  <option selected>Choose File</option>
+                </select>
+				</br>
+				<div class="form-row">
+					<div class="form-group col-md-6">
+					  <label for="query5-n">N</label>
+					  <input class="form-control" id="query5-n" required>
+					</div>
+				</div>
+              </div>
+            </div>
+			</br>
+			<button type="button" class="btn btn-dark" id="query5-sort-name" disabled>Sort By Name</button>
+			<button type="button" class="btn btn-dark" id="query5-sort-length" disabled>Sort By Length</button>
+        </form>
+		</br>
+		<table class="table table-dark table-hover" id="query5-table">
+            <thead>
+                <tr>
+					<th scope="col">Route Name</th>
+                    <th scope="col">Route Length</th>
+					<th scope="col">Route ID</th>
+					<th scope="col">File Name</th>
+                </tr>
+            </thead>
+            <tbody id="query5-table-body">
+            
+            </tbody>
+        </table>
+	</div>
+</div>
+</br>
+
+</br>
+    <!-- Leave me at the bottom of body -->
+    <script src="/index.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
