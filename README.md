@@ -1,2 +1,2 @@
 # GPX-Application
-GPX Application for CIS 2750
+GPX Application
